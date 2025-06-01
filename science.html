@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Science Quiz</title>
+  <style>
+    * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background-color: #f4f4f9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 400px;
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+#question-box {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: #555;
+}
+
+#options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.option {
+  background-color: #e0e0e0;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.option:hover {
+  background-color: #d0d0d0;
+}
+
+.option.selected {
+  background-color: #007bff;
+  color: white;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 5px;
+}
+
+#next-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+#submit-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+#submit-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+#result {
+  margin-top: 20px;
+  font-size: 18px;
+  color: #333;
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Science Quiz</h1>
+    <div id="quiz-container">
+      <div id="question-box"></div>
+      <div id="options-container"></div>
+      <button id="next-btn">Next</button>
+      <button id="submit-btn">Submit</button>
+      <div id="result"></div>
+    </div>
+  </div>
+
+  <script>
+    // Quiz Data
+const quizData = [
+  {
+    question: "What is the chemical symbol for water?",
+    options: ["H2O", "CO2", "NaCl", "O2"],
+    answer: "H2O",
+  },
+  {
+    question: "Which planet is known as the Red Planet?",
+    options: ["Earth", "Mars", "Jupiter", "Venus"],
+    answer: "Mars",
+  },
+  {
+    question: "What is the process by which plants make their own food?",
+    options: ["Respiration", "Photosynthesis", "Transpiration", "Fermentation"],
+    answer: "Photosynthesis",
+  },
+  {
+    question: "What is the smallest unit of matter?",
+    options: ["Atom", "Cell", "Molecule", "Electron"],
+    answer: "Atom",
+  },
+  {
+    question: "Who discovered gravity?",
+    options: ["Albert Einstein", "Isaac Newton", "Galileo Galilei", "Niels Bohr"],
+    answer: "Isaac Newton",
+  },
+];
+
+let currentQuestionIndex = 0;
+let score = 0;
+let selectedAnswer = null;
+
+// DOM Elements
+const questionBox = document.getElementById("question-box");
+const optionsContainer = document.getElementById("options-container");
+const nextBtn = document.getElementById("next-btn");
+const submitBtn = document.getElementById("submit-btn");
+const resultDiv = document.getElementById("result");
+
+// Load Question
+function loadQuestion() {
+  const currentQuestion = quizData[currentQuestionIndex];
+  questionBox.textContent = `${currentQuestionIndex + 1}. ${currentQuestion.question}`;
+  optionsContainer.innerHTML = "";
+
+  currentQuestion.options.forEach((option) => {
+    const optionElement = document.createElement("div");
+    optionElement.classList.add("option");
+    optionElement.textContent = option;
+
+    optionElement.addEventListener("click", () => {
+      if (!selectedAnswer) {
+        selectedAnswer = option;
+        optionElement.classList.add("selected");
+        disableOptions();
+      }
+    });
+
+    optionsContainer.appendChild(optionElement);
+  });
+
+  nextBtn.style.display = "inline-block";
+  submitBtn.style.display = currentQuestionIndex === quizData.length - 1 ? "inline-block" : "none";
+}
+
+// Disable Options After Selection
+function disableOptions() {
+  const options = document.querySelectorAll(".option");
+  options.forEach((option) => {
+    option.style.pointerEvents = "none";
+  });
+}
+
+// Enable Options for Next Question
+function enableOptions() {
+  const options = document.querySelectorAll(".option");
+  options.forEach((option) => {
+    option.style.pointerEvents = "auto";
+    option.classList.remove("selected");
+  });
+}
+
+// Handle Next Button Click
+nextBtn.addEventListener("click", () => {
+  if (selectedAnswer) {
+    if (selectedAnswer === quizData[currentQuestionIndex].answer) {
+      score++;
+    }
+
+    currentQuestionIndex++;
+    selectedAnswer = null;
+    enableOptions();
+
+    if (currentQuestionIndex < quizData.length) {
+      loadQuestion();
+    } else {
+      showResult();
+    }
+  }
+});
+
+// Handle Submit Button Click
+submitBtn.addEventListener("click", () => {
+  if (selectedAnswer === quizData[currentQuestionIndex].answer) {
+    score++;
+  }
+  showResult();
+});
+
+// Show Final Result
+function showResult() {
+  questionBox.textContent = "Quiz Completed!";
+  optionsContainer.innerHTML = "";
+  nextBtn.style.display = "none";
+  submitBtn.style.display = "none";
+  resultDiv.textContent = `You scored ${score} out of ${quizData.length}`;
+}
+
+// Initialize Quiz
+loadQuestion();
+  </script>
+</body>
+</html>
